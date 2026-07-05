@@ -125,11 +125,19 @@ function serveStatic(req, res, pathname) {
 }
 
 // ===== Main server =====
-const server = http.createServer(async (req, res) => {
-  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-  const pathname = parsedUrl.pathname;
-
+const requestListener = async (req, res) => {
   try {
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const pathname = parsedUrl.pathname;
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') {
+      res.writeHead(200);
+      return res.end();
+    }
+
     // ===== Auth: Signup =====
     if (pathname === '/api/auth/signup' && req.method === 'POST') {
       const body = await readBody(req);
@@ -298,8 +306,14 @@ const server = http.createServer(async (req, res) => {
     console.error(err);
     return sendJSON(res, 500, { error: 'حصل خطأ غير متوقع في السيرفر' });
   }
-});
+};
 
-server.listen(PORT, () => {
-  console.log(`✅ البس شغال على http://localhost:${PORT}`);
-});
+const server = http.createServer(requestListener);
+
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`✅ البس شغال على http://localhost:${PORT}`);
+  });
+}
+
+module.exports = requestListener;
