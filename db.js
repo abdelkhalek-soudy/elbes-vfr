@@ -3,7 +3,13 @@
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 
-const DB_PATH = path.join(__dirname, 'db', 'orders.db');
+let DB_PATH;
+if (process.env.VERCEL) {
+  // Vercel serverless functions only allow writing to /tmp
+  DB_PATH = path.join('/tmp', 'orders.db');
+} else {
+  DB_PATH = path.join(__dirname, 'db', 'orders.db');
+}
 const db = new DatabaseSync(DB_PATH);
 
 db.exec(`
