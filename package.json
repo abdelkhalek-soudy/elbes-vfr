@@ -1,0 +1,13 @@
+{
+  "name": "elbes-virtual-fitting-room",
+  "version": "2.0.0",
+  "private": true,
+  "description": "البس — غرفة القياس الافتراضية مع نظام مصادقة ولوحة تحكم",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

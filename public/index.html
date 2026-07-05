@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>البس | غرفة القياس الافتراضية</title>
+<meta name="description" content="مقاسك الدقيق أونلاين — البس غرفة القياس الافتراضية" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<header class="site">
+  <div class="container">
+    <div class="brand">البس<span>غرفة القياس الافتراضية</span></div>
+    <nav class="site-nav">
+      <a href="/" class="active">الرئيسية</a>
+      <a href="/measure.html">احسب مقاسك</a>
+      <a href="/track.html">تتبّع طلبك</a>
+    </nav>
+    <div id="navUserArea" class="nav-auth-links">
+      <a href="/login.html" class="login-link">دخول</a>
+      <a href="/signup.html" class="signup-link">حساب جديد</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>مقاسك الدقيق<br/><span class="highlight">من غير ما تتحرك من مكانك</span></h1>
+    <p>
+      دخّل طولك ووزنك، ومحرك المطابقة بتاعنا
+      هيقارنها بجدول مقاسات عالمي حقيقي، ويطلعلك المقاس الأنسب + تقرير تعديلات
+      جاهز يوصل للترزي أو المصنع مباشرة.
+    </p>
+    <a href="/measure.html" class="btn btn-gold">ابدأ القياس الآن</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>دخّل قياساتك</h3>
+        <p>الطول والوزن كافيين للبداية، وممكن تضيف قياسات دقيقة لو حابب دقة أعلى.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>شوف النتيجة والأفاتار</h3>
+        <p>مقاسك، نسبة الثقة في الحساب، وتقرير تعديلات دقيق لكل قطعة.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>أكّد طلبك وتتبّعه</h3>
+        <p>هتاخد كود تتبع فريد تقدر تراجع بيه حالة طلبك في أي وقت.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="container">© البس — غرفة القياس الافتراضية</div>
+</footer>
+
+<script>
+(function(){
+  fetch('/api/auth/me').then(r=>r.json()).then(d=>{
+    const area = document.getElementById('navUserArea');
+    if(d.user){
+      area.className = 'nav-user';
+      const initial = d.user.name ? d.user.name.charAt(0) : '?';
+      let links = '';
+      if(d.user.role === 'admin') links += '<a href="/admin.html">لوحة التحكم</a> | ';
+      links += '<a href="#" id="logoutLink">خروج</a>';
+      area.innerHTML = '<div class="user-avatar">'+initial+'</div><div><span class="user-name">'+d.user.name+'</span><br/>'+links+'</div>';
+      const logoutEl = document.getElementById('logoutLink');
+      if(logoutEl) logoutEl.addEventListener('click', e=>{
+        e.preventDefault();
+        fetch('/api/auth/logout',{method:'POST'}).then(()=>location.reload());
+      });
+    }
+  }).catch(()=>{});
+})();
+</script>
+</body>
+</html>

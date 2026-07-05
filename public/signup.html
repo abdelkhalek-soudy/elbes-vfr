@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إنشاء حساب | البس</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+
+    <header class="site">
+        <div class="container">
+            <div class="brand">البس<span>غرفة القياس الافتراضية</span></div>
+            <nav class="site-nav">
+                <a href="/">الرئيسية</a>
+                <a href="/measure.html">احسب مقاسك</a>
+                <a href="/track.html">تتبّع طلبك</a>
+            </nav>
+            <div class="nav-auth-links">
+                <a href="/login.html" class="login-link">دخول</a>
+                <a href="/signup.html" class="signup-link" style="box-shadow:0 0 10px var(--accent-glow);">حساب جديد</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-page">
+        <div class="auth-card">
+            <div class="card">
+                <h2>إنشاء حساب جديد</h2>
+                <div class="auth-sub">سجّل عشان تقدر تأكد طلباتك وتتابعها</div>
+
+                <div id="errorBox" class="error-box"></div>
+
+                <form id="signupForm">
+                    <div class="field">
+                        <label>الاسم</label>
+                        <input type="text" id="name" placeholder="اسمك بالكامل" required />
+                    </div>
+                    <div class="field">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="email" placeholder="example@mail.com" required style="direction:ltr;" />
+                    </div>
+                    <div class="field">
+                        <label>كلمة السر</label>
+                        <input type="password" id="password" placeholder="6 حروف على الأقل" required minlength="6" />
+                    </div>
+                    <button type="submit" class="btn btn-gold btn-block" id="signupBtn">إنشاء الحساب</button>
+                </form>
+
+                <div class="auth-footer">
+                    عندك حساب بالفعل؟ <a href="/login.html">سجّل دخول</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site">
+        <div class="container">© البس — غرفة القياس الافتراضية</div>
+    </footer>
+
+    <script>
+        (function () {
+            document.getElementById('signupForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const errBox = document.getElementById('errorBox');
+                errBox.classList.remove('show');
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                if (!name || !email || !password) {
+                    errBox.textContent = 'كل الحقول مطلوبة';
+                    errBox.classList.add('show');
+                    return;
+                }
+                if (password.length < 6) {
+                    errBox.textContent = 'كلمة السر لازم تكون على الأقل 6 حروف';
+                    errBox.classList.add('show');
+                    return;
+                }
+                const btn = document.getElementById('signupBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>';
+                try {
+                    const res = await fetch('/api/auth/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        errBox.textContent = data.error || 'فشل إنشاء الحساب';
+                        errBox.classList.add('show');
+                        btn.disabled = false;
+                        btn.textContent = 'إنشاء الحساب';
+                        return;
+                    }
+                    const params = new URLSearchParams(window.location.search);
+                    const redirect = params.get('redirect') || '/';
+                    window.location.href = redirect;
+                } catch (err) {
+                    errBox.textContent = 'تعذر الاتصال بالسيرفر';
+                    errBox.classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = 'إنشاء الحساب';
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

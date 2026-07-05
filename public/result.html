@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نتيجة القياس | البس</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+
+  <header class="site">
+    <div class="container">
+      <div class="brand">البس<span>غرفة القياس الافتراضية</span></div>
+      <nav class="site-nav">
+        <a href="/">الرئيسية</a>
+        <a href="/measure.html">احسب مقاسك</a>
+        <a href="/track.html">تتبّع طلبك</a>
+      </nav>
+      <div id="navUserArea" class="nav-auth-links">
+        <a href="/login.html" class="login-link">دخول</a>
+        <a href="/signup.html" class="signup-link">حساب جديد</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+
+      <div id="loadingState" style="text-align:center; padding:60px 0; color:var(--text-secondary);">
+        <span class="loading-dot"></span> جاري تحميل النتيجة...
+      </div>
+
+      <div id="errorState" style="display:none; text-align:center; padding:60px 0;">
+        <p style="color:var(--danger);" id="errorMsg"></p>
+        <a href="/measure.html" class="btn btn-outline">ارجع للاستمارة</a>
+      </div>
+
+      <div id="content" style="display:none;">
+        <div class="section-title">نتيجة القياس</div>
+        <div class="section-sub">دي أقرب مطابقة لجسمك من جدول المقاسات القياسي.</div>
+
+        <!-- Gender / Top Category toggles -->
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px;">
+          <div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">الجنس</div>
+            <div class="toggle-group" id="genderToggle">
+              <div class="toggle-option gender-option" data-gender="male">رجالي</div>
+              <div class="toggle-option gender-option" data-gender="female">حريمي</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">القطعة العلوية</div>
+            <div class="toggle-group" id="topToggle">
+              <div class="toggle-option top-option" data-top="jacket">جاكيت</div>
+              <div class="toggle-option top-option" data-top="tshirt">تيشرت</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <!-- عمود المقاس والتعديلات -->
+          <div>
+            <div class="card" style="margin-bottom:20px;">
+              <div style="display:flex; align-items:center; gap:20px;">
+                <div class="size-badge" id="sizeBadge">--</div>
+                <div style="flex:1;">
+                  <div style="color:var(--text-secondary); font-size:13px;">مقاسك المقترح (EU)</div>
+                  <div style="font-size:13px; margin-top:10px; color:var(--accent-light);">نسبة الثقة: <span
+                      id="confidenceVal">--</span>%</div>
+                  <div class="confidence-bar">
+                    <div id="confidenceBar" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 style="margin-top:0; color:var(--accent-light); font-size:16px;">تقرير التعديلات المقترحة</h3>
+              <div id="alterationsList"></div>
+            </div>
+          </div>
+
+          <!-- عمود الأفاتار والألوان -->
+          <div>
+            <div class="avatar-box" style="margin-bottom:20px;">
+              <div id="avatarWrap"></div>
+            </div>
+
+            <div class="card">
+              <h3 style="margin-top:0; color:var(--accent-light); font-size:16px;">اختر التنسيق</h3>
+
+              <div class="color-group">
+                <div class="color-group-label" id="topLabel">الجاكيت</div>
+                <div class="color-row" id="jacketColors"></div>
+              </div>
+              <div class="color-group" id="shirtGroup">
+                <div class="color-group-label">القميص</div>
+                <div class="color-row" id="shirtColors"></div>
+              </div>
+              <div class="color-group">
+                <div class="color-group-label">البنطلون</div>
+                <div class="color-row" id="pantsColors"></div>
+              </div>
+              <div class="color-group">
+                <div class="color-group-label">الحذاء</div>
+                <div class="color-row" id="shoesColors"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- كود التتبع -->
+        <div class="tracking-box">
+          <div style="color:var(--text-secondary); font-size:13px; margin-bottom:6px;">كود تتبع طلبك</div>
+          <div class="tracking-code" id="trackingCode">--</div>
+          <div style="margin-top:8px;"><span class="status-pill" id="statusPill">--</span></div>
+        </div>
+
+        <!-- تأكيد الطلب -->
+        <div class="card" style="margin-top:24px;">
+          <h3 style="margin-top:0; color:var(--accent-light); font-size:16px;">تأكيد الطلب</h3>
+          <div id="confirmError" class="error-box"></div>
+
+          <!-- Login prompt (shown if not logged in) -->
+          <div id="loginPrompt" class="login-prompt" style="display:none;">
+            <p>لازم تسجّل دخول عشان تقدر تأكد الطلب</p>
+            <a href="/login.html" class="btn btn-gold btn-sm" id="loginRedirectBtn">تسجيل الدخول</a>
+            <span style="margin: 0 8px; color:var(--text-muted);">أو</span>
+            <a href="/signup.html" class="btn btn-outline btn-sm" id="signupRedirectBtn">حساب جديد</a>
+          </div>
+
+          <!-- Confirm form (shown if logged in) -->
+          <div id="confirmForm" style="display:none;">
+            <div class="grid-2">
+              <div class="field">
+                <label>الاسم</label>
+                <input type="text" id="confirmName" placeholder="اسمك بالكامل" />
+              </div>
+              <div class="field">
+                <label>رقم الهاتف</label>
+                <input type="tel" id="confirmPhone" placeholder="01xxxxxxxxx" />
+              </div>
+            </div>
+            <button class="btn btn-gold btn-block" id="confirmBtn">تأكيد الطلب</button>
+          </div>
+
+          <!-- Confirmed message -->
+          <div id="confirmedMsg"
+            style="display:none; color:var(--success); font-weight:700; text-align:center; padding:14px 0;">
+            ✓ تم تأكيد طلبك بنجاح
+          </div>
+        </div>
+
+        <!-- أمر التشغيل -->
+        <div class="card" style="margin-top:24px;">
+          <h3 style="margin-top:0; color:var(--accent-light); font-size:16px;">أمر التشغيل (للترزي / المصنع)</h3>
+          <div class="order-ticket" id="orderTicket">--</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="site">
+    <div class="container">© البس — غرفة القياس الافتراضية</div>
+  </footer>
+
+  <script src="/js/avatar.js"></script>
+  <script src="/js/result.js"></script>
+</body>
+
+</html>

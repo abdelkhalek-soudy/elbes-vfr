@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>احسب مقاسك | البس</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+
+  <header class="site">
+    <div class="container">
+      <div class="brand">البس<span>غرفة القياس الافتراضية</span></div>
+      <nav class="site-nav">
+        <a href="/">الرئيسية</a>
+        <a href="/measure.html" class="active">احسب مقاسك</a>
+        <a href="/track.html">تتبّع طلبك</a>
+      </nav>
+      <div id="navUserArea" class="nav-auth-links">
+        <a href="/login.html" class="login-link">دخول</a>
+        <a href="/signup.html" class="signup-link">حساب جديد</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container" style="max-width:960px;">
+
+      <div class="measure-split">
+        <!-- صورة الموبايل المجسمة -->
+        <div class="measure-demo">
+          <img src="/img/Screenshot%202026-07-05%20123129.png" alt="شكل الأفاتار على الموبايل" class="demo-img" />
+          <div class="demo-caption">
+            ارفع صورتك وهنركبها على المجسم عشان تشوف الشكل بالظبط!
+          </div>
+        </div>
+
+        <!-- استمارة القياس -->
+        <div class="measure-form-wrapper">
+          <div class="section-title" style="margin-bottom:8px;">استمارة القياس</div>
+          <div class="section-sub" style="margin-bottom:24px;">كل البيانات دي بتتستخدم في حساب مقاسك بس، ومحفوظة بشكل
+            آمن.</div>
+
+          <div class="card">
+            <div id="errorBox" class="error-box"></div>
+
+            <form id="measureForm">
+              <!-- رفع الصورة لتركيب الوجه -->
+              <div class="field"
+                style="background:var(--accent-glow); padding:16px; border-radius:var(--radius-sm); border:1px dashed var(--accent);">
+                <label>صورتك الشخصية (عشان نركب الوجه على الأفاتار)</label>
+                <input type="file" id="faceImage" accept="image/*"
+                  style="border:none; padding:8px 0; background:transparent;" />
+                <div class="hint">ارفع صورة واضحة لوشك، وهنستخدمها في عرض النتيجة بس ومش هتتخزن.</div>
+              </div>
+
+              <div class="grid-2">
+                <div class="field">
+                  <label>الطول (سم)</label>
+                  <input type="number" id="height" min="140" max="220" placeholder="مثال: 178" required />
+                </div>
+                <div class="field">
+                  <label>الوزن (كجم)</label>
+                  <input type="number" id="weight" min="35" max="220" placeholder="مثال: 82" required />
+                </div>
+              </div>
+
+              <div class="field">
+                <label>القصة المفضلة</label>
+                <div class="fit-options" id="fitOptions">
+                  <div class="fit-option" data-fit="slim">ضيقة (Slim)</div>
+                  <div class="fit-option selected" data-fit="regular">عادية (Regular)</div>
+                  <div class="fit-option" data-fit="relaxed">واسعة (Relaxed)</div>
+                </div>
+              </div>
+
+              <div class="details-toggle" id="detailsToggle">+ إضافة قياسات دقيقة (اختياري)</div>
+              <div class="details-panel" id="detailsPanel">
+                <div class="grid-3">
+                  <div class="field">
+                    <label>محيط الصدر (سم)</label>
+                    <input type="number" id="chest" placeholder="اختياري" />
+                  </div>
+                  <div class="field">
+                    <label>محيط الخصر (سم)</label>
+                    <input type="number" id="waist" placeholder="اختياري" />
+                  </div>
+                  <div class="field">
+                    <label>عرض الكتف (سم)</label>
+                    <input type="number" id="shoulder" placeholder="اختياري" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>الاسم (اختياري دلوقتي)</label>
+                <input type="text" id="name" placeholder="اسمك" />
+              </div>
+              <div class="field">
+                <label>رقم الهاتف (اختياري دلوقتي)</label>
+                <input type="tel" id="phone" placeholder="01xxxxxxxxx" />
+              </div>
+
+              <button type="submit" class="btn btn-gold btn-block" id="submitBtn">احسب مقاسي وأنشئ الأفاتار</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="site">
+    <div class="container">© البس — غرفة القياس الافتراضية</div>
+  </footer>
+
+  <script src="/js/measure.js"></script>
+  <script>
+    (function () {
+      fetch('/api/auth/me').then(r => r.json()).then(d => {
+        const area = document.getElementById('navUserArea');
+        if (d.user) {
+          area.className = 'nav-user';
+          const initial = d.user.name ? d.user.name.charAt(0) : '?';
+          let links = '';
+          if (d.user.role === 'admin') links += '<a href="/admin.html">لوحة التحكم</a> | ';
+          links += '<a href="#" id="logoutLink">خروج</a>';
+          area.innerHTML = '<div class="user-avatar">' + initial + '</div><div><span class="user-name">' + d.user.name + '</span><br/>' + links + '</div>';
+          const logoutEl = document.getElementById('logoutLink');
+          if (logoutEl) logoutEl.addEventListener('click', e => { e.preventDefault(); fetch('/api/auth/logout', { method: 'POST' }).then(() => location.reload()); });
+        }
+      }).catch(() => { });
+    })();
+  </script>
+</body>
+
+</html>

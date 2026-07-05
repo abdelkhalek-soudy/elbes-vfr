@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تتبّع طلبك | البس</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+
+  <header class="site">
+    <div class="container">
+      <div class="brand">البس<span>غرفة القياس الافتراضية</span></div>
+      <nav class="site-nav">
+        <a href="/">الرئيسية</a>
+        <a href="/measure.html">احسب مقاسك</a>
+        <a href="/track.html" class="active">تتبّع طلبك</a>
+      </nav>
+      <div id="navUserArea" class="nav-auth-links">
+        <a href="/login.html" class="login-link">دخول</a>
+        <a href="/signup.html" class="signup-link">حساب جديد</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container" style="max-width:560px;">
+      <div class="section-title">تتبّع الطلب</div>
+      <div class="section-sub">دخّل كود التتبع اللي اتديتلك بعد ما عملت القياس.</div>
+
+      <div class="card">
+        <div id="errorBox" class="error-box"></div>
+        <div class="field">
+          <label>كود التتبع</label>
+          <input type="text" id="codeInput" placeholder="VFR-XXXXXX"
+            style="direction:ltr; text-align:center; letter-spacing:2px; font-weight:700;" />
+        </div>
+        <button class="btn btn-gold btn-block" id="trackBtn">بحث</button>
+      </div>
+
+      <div id="resultCard" class="card" style="margin-top:20px; display:none;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+          <div>
+            <div style="color:var(--text-secondary); font-size:13px;">المقاس</div>
+            <div style="font-size:26px; font-weight:800; color:var(--accent-light);" id="rSize">--</div>
+          </div>
+          <span class="status-pill" id="rStatus">--</span>
+        </div>
+        <div class="alteration-row"><span>القصة</span><span id="rFit">--</span></div>
+        <div class="alteration-row"><span>نسبة الثقة</span><span id="rConfidence">--</span></div>
+        <div class="alteration-row"><span>تنسيق الألوان</span><span id="rColors">--</span></div>
+        <div style="margin-top:16px;">
+          <a href="#" id="viewFullLink" class="btn btn-outline btn-block">عرض التفاصيل الكاملة</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site">
+    <div class="container">© البس — غرفة القياس الافتراضية</div>
+  </footer>
+
+  <script src="/js/track.js"></script>
+  <script>
+    (function () {
+      fetch('/api/auth/me').then(r => r.json()).then(d => {
+        const area = document.getElementById('navUserArea');
+        if (d.user) {
+          area.className = 'nav-user';
+          const initial = d.user.name ? d.user.name.charAt(0) : '?';
+          let links = '';
+          if (d.user.role === 'admin') links += '<a href="/admin.html">لوحة التحكم</a> | ';
+          links += '<a href="#" id="logoutLink">خروج</a>';
+          area.innerHTML = '<div class="user-avatar">' + initial + '</div><div><span class="user-name">' + d.user.name + '</span><br/>' + links + '</div>';
+          const logoutEl = document.getElementById('logoutLink');
+          if (logoutEl) logoutEl.addEventListener('click', e => { e.preventDefault(); fetch('/api/auth/logout', { method: 'POST' }).then(() => location.reload()); });
+        }
+      }).catch(() => { });
+    })();
+  </script>
+</body>
+
+</html>
